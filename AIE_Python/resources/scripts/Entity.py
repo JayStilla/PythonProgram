@@ -5,6 +5,77 @@ import game
 #   A simple entity that can be placed on the screen with a right click, you should modify this so that the tank can be told to 
 #   navigate to a point instead of instantly move.
 
+#start of custom classes
+class LinkedListNode:
+	def __init__(self, inData, inNext):
+		self.data = inData
+		self.next = inNext
+
+class LinkedList:
+	def __init__(self):
+		self.firstNode = LinkedListNode(None, None)
+		self.lastNode = self.firstNode
+		self.size = 0
+	def add(self, data):
+		node = LinkedListNode(data, None)
+		node.data = data
+		
+		if self.firstNode.data == None
+			self.firstNode = node
+			self.lastNode = node
+		else:
+			self.lastNode.next = node
+			self.lastNode = node
+			
+		self.size += 1
+	
+	def add_many(self, list_of_data):
+		for x in list_of_data:
+			self.add(x)
+	
+	def remove(self, data):
+		currentNode = self.firstNode
+		wasDeleted = False
+		
+		if self.size == 0:
+			pass
+		
+		if data == currentNode.data:
+			if currentNode.next == None:
+				self.firstNode = LinkedListNode(None, None)
+				self.lastNode = self.firstNode
+				self.size = self.size - 1
+				return
+				
+			currentNode = currentNode.next
+			self.firstNode = currentNode
+			self.size = self.size - 1
+			return
+		
+		while True:
+			if currentNode == None:
+				wasDeleted = False
+				break
+			
+			nextNode = currentNode.next
+			if nextNode != None:
+				if data == nextNode.data:
+					nextNextNode = nextNode.next
+					currentNode.next = nextNextNode
+					
+					nextNode = None
+					wasDeleted = True
+					break
+			currentNode = currentNode.next
+		if wasDeleted:
+			self.size = self.size - 1
+			
+	def remove_many(self, list_of_data):
+		for x in list_of_data:
+			self.remove(x)
+
+#end of custom node and list classes
+
 class TankEntity:
 
 	def __init__(self):
@@ -18,13 +89,31 @@ class TankEntity:
 		#Move Tile to appropriate location
 		
 		self.turret = Turret(self)
+	#start of custom functions
+	def seek(self, mouseX, mouseY):
+		if(self.Position !=(mouseX, mouseY)):
+			lerpX = (self.Position[0] + (mouseX - self.Position[0]) * 0.1)
+			lerpY = (self.Position[1] + (mouseY - self.Position[1]) * 0.1)
+			lerp = (lerpX, lerpY)
+			return lerp
+		else:
+			pass
+	
+	def flee(self, mouseX, mouseY):
+		lerpX = (self.Position[0] - (mouseX - self.Position[0]) * 0.1)
+		lerpY = (self.Position[1] - (mouseY - self.Position[1]) * 0.1)
+		lerp = (lerpX, lerpY)
+		return lerp
 		
+	#end of custom functions
 		
 	def update(self, fDeltaTime ):
 		mouseX, mouseY = AIE.GetMouseLocation()
 		if( AIE.GetMouseButton(1)  ):
-			self.Position =(mouseX, mouseY)
-		AIE.MoveSprite( self.spriteID, self.Position[0], self.Position[1] )
+			self.Position = self.seek(mouseX, mouseY)
+		elif( AIE.GetMouseButton(0) ):
+			self.Position = self.flee(mouseX, mouseY)
+		AIE.MoveSprite( self.spriteID, self.Position[0], self.Position[1] ) # write Python side positions to C++ side positions
 		self.turret.update(fDeltaTime)
 	
 	def draw(self):
