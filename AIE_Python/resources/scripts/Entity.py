@@ -1,6 +1,8 @@
 import AIE
 import game
 
+import Collision
+from Collision import CircCollision
 #Tank Entity
 #   A simple entity that can be placed on the screen with a right click, you should modify this so that the tank can be told to 
 #   navigate to a point instead of instantly move.
@@ -20,7 +22,7 @@ class LinkedList:
 		node = LinkedListNode(data, None)
 		node.data = data
 		
-		if self.firstNode.data == None
+		if self.firstNode.data == None:
 			self.firstNode = node
 			self.lastNode = node
 		else:
@@ -83,6 +85,7 @@ class TankEntity:
 		self.Rotation = 0
 		self.spriteName = "./images/PlayerTanks.png"
 		self.size = (57, 72 )
+		self.Collider = CircCollision(self, (self.size[1] / 2.0))
 		self.origin = (0.5, 0.5)
 		self.spriteID = AIE.CreateSprite( self.spriteName, self.size[0], self.size[1], self.origin[0], self.origin[1], 71.0/459.0, 1.0 - 72.0/158.0, 128/459.0, 1.0 , 0xff, 0xff, 0xff, 0xff )
 		print "spriteID", self.spriteID
@@ -108,6 +111,9 @@ class TankEntity:
 	#end of custom functions
 		
 	def update(self, fDeltaTime ):
+		#Update Collider
+		self.Collider.update(self)
+	
 		mouseX, mouseY = AIE.GetMouseLocation()
 		if( AIE.GetMouseButton(1)  ):
 			self.Position = self.seek(mouseX, mouseY)
@@ -115,6 +121,7 @@ class TankEntity:
 			self.Position = self.flee(mouseX, mouseY)
 		AIE.MoveSprite( self.spriteID, self.Position[0], self.Position[1] ) # write Python side positions to C++ side positions
 		self.turret.update(fDeltaTime)
+		
 	
 	def draw(self):
 		

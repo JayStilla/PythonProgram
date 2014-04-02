@@ -16,11 +16,14 @@ class LevelGrid:
 		self.levelSize = self.levelWidth * (self.levelHeight+1)
 		print "LevelSize :", self.levelWidth, " ", self.levelHeight
 		self.levelTiles = [None] * int(self.levelSize)
+		NodeNumber = 1
 		
 		for i in range(int(self.levelSize)):
 			self.levelTiles[i] = Tile()
 			self.levelTiles[i].x = self.tileSize['width'] * (i % int(self.levelWidth))
 			self.levelTiles[i].y = self.tileSize['height'] * ( (int(i)/(int(self.levelWidth))))
+			self.levelTiles[i].NodeNumber = NodeNumber
+			NodeNumber += 1
 	
 	def loadSprites(self):
 		#load all sprites for each tile
@@ -33,13 +36,23 @@ class LevelGrid:
 	def update(self, fDeltaTime):
 		mouseX, mouseY = AIE.GetMouseLocation()
 		
-		if( AIE.GetMouseButton(2)  and (self.buttonPressed is False) ):
+		if( AIE.GetMouseButton(2)  and (self.buttonPressed is False)):
 			self.buttonPressed = True
 			tileIndex = int(self.resolveGridSquare(mouseX, mouseY))
-			if( tileIndex >= 0 and tileIndex < self.levelSize ):
+			
+			if( tileIndex >= 0 and tileIndex < self.levelSize and self.levelTiles[tileIndex].NodePassable == True):
 				self.levelTiles[tileIndex].setDraw()
+				self.levelTiles[tileIndex].NodePassable = False
+				print self.levelTiles[tileIndex].NodeNumber
+				print self.levelTiles[tileIndex].NodePassable
+			
+			else:
+				self.levelTiles[tileIndex].setDraw()
+				self.levelTiles[tileIndex].NodePassable = True
+				print self.levelTiles[tileIndex].NodeNumber
+				print self.levelTiles[tileIndex].NodePassable
 				
-		self.buttonPressed = not AIE.GetMouseButtonRelease(0)		
+		self.buttonPressed = not AIE.GetMouseButtonRelease(2)		
 		
 		
 	def draw(self):
@@ -67,6 +80,8 @@ class Tile:
 		self.state = 0
 		self.x = 0
 		self.y = 0
+		self.NodeNumber = 0
+		self.NodePassable = True
 	
 	def getImageName(self):
 		return self.imageName
