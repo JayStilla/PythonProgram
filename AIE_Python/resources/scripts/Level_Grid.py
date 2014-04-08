@@ -35,7 +35,6 @@ class LevelGrid:
 	
 	def update(self, fDeltaTime):
 		mouseX, mouseY = AIE.GetMouseLocation()
-		
 		if( AIE.GetMouseButton(2)  and (self.buttonPressed is False)):
 			self.buttonPressed = True
 			tileIndex = int(self.resolveGridSquare(mouseX, mouseY))
