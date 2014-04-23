@@ -25,6 +25,10 @@ class Vec2:
 		return math.sqrt(first + second)
 	def getNormal(self):
 		mag = self.getMag()
+
+		# if mag is fucking zero
+		# then return Vec2(0,0)
+
 		self.x /= mag
 		self.y /= mag 
 		return self
@@ -53,9 +57,6 @@ class TankEntity:
 		self.spriteID = AIE.CreateSprite( self.spriteName, self.size[0], self.size[1], self.origin[0], self.origin[1], 71.0/459.0, 1.0 - 72.0/158.0, 128/459.0, 1.0 , 0xff, 0xff, 0xff, 0xff )
 		self.wanderAngle = 0.0
 		self.inputBehavior = 0
-		self.nodes = set()
-		self.edges = {}
-		self.distances = {}
 		print "spriteID", self.spriteID
 		#Move Tile to appropriate location
 		
@@ -92,7 +93,7 @@ class TankEntity:
 		self.keepOnScreen()
 		mouseX, mouseY = AIE.GetMouseLocation()
 		if( AIE.GetMouseButton(1)  ):
-			self.Position = self.dijkstra(1)
+			self.Position = self.seek(mouseX, mouseY)
 		elif( AIE.GetMouseButton(0) ):
 			self.Position = self.flee(mouseX, mouseY)
 		AIE.MoveSprite( self.spriteID, self.Position[0], self.Position[1] ) # write Python side positions to C++ side positions
@@ -143,43 +144,6 @@ class TankEntity:
 
 		if self.Position.y < -1.0:
 			self.Position.y = screenProperties['height']
-
-	def dijkstra(self, initial_node):
-		visited = {initial_node : 0}
-		current_node = initial_node
-		#shorthand for None
-		path = {}
-		nodes = set(self.nodes)
-		while nodes:
-			min_node = None
-			for node in nodes:
-				if node in visited:
-					if min_node is None:
-						min_node = node
-					elif visited[node]<visited[min_node]:
-						min_node = node
-			if min_node is None:
-				break
-			nodes.remove(min_node)
-			current_weight = visited[min_node]
-#			for edge in self.edges[min_node]:
-#				weight = current_weight + self.distances[(min_node, edge)]
-#				if edge not in visited or weight < visited[edge]:
-#					visited[edge] = weight 
-#					path[edge] = min_node
-		return visited, path
-		def shortestPath():
-			distances, paths = dijkstra(self, initial_node)
-			route = [goal_node]
-
-			while goal_node != initial_node:
-				route.append(paths[goal_node])
-				goal_node = paths[goal_node]
-
-			route.reverse()
-			return route
-
-
 
 	def draw(self):
 		
